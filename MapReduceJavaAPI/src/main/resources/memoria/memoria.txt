@@ -1,0 +1,59 @@
+Consideraciones generales
+
+En la ruta "src/main/resources/ejercicios" están los ficheros '.txt' de los que se abastecen los jobs.
+
+En la ruta "src/main/java/ejercicios" se ha creado la clase "Driver" donde están definidas todas las clases de los Jobs
+
+En la ruta "src/main/java/ejercicios/writables" se ha agrupado las las distintas clases writable que usan los jobs de los ejercicios.
+
+En todos los Jobs se comprueba que el numero de argumentos es el correcto.
+
+
+
+
+Ejercicio 1
+
+La ruta de los paquetes es "src/main/java/ejercicios/histograma"
+
+Al constar este ejercicio de dos Jobs, los nombres de las clases comienzan todas como 'HistogramaJob' seguido de un numero que indica el job al que pertenece, seguido de 'map', 'reduce'... según su funcionalidad. Existe también una clase 'HistogramaJobFlow' que se encarga de lanzar los dos jobs automáticamente. los argumentos de la misma son: fichero de entrada, fichero de salida y el numero de columnas por el que se quiere agrupar los números del fichero de entrada.
+
+En el 'HistogramaJobFlow' se hace la llamada a los dos jobs con el 'ToolRunner'. Al segundo parámetro el de fichero de salida, se le concatena job1 y job2 a sendas variables para utilizarlo en las llamadas a los dos jobs del proceso. Al primero se le pasa como parámetro el fichero de entrada de datos y la ruta del fichero de salida del job1. para el segundo job, se le pasa como parámetro el fichero de entrada de datos el nombre del fichero de salida de datos del job uno, su propio nombre salida de datos y el numero de columnas por el que se quiere agrupar los números del fichero de entrada.
+
+En el primer job se a creado la clase 'MaxMinDoubleWritable' para manejar de una manera mas facil el value que se pasa del map al reduce. el conjunto de clave/valor consiste en dos Double
+
+En el segundo job se setea en el objeto 'Configuration' el argumento del numero de columnas y el path del fichero de salida del job1 para utilizarlo en el map. antes del método map se ejecuta el 'setup' donde se recogen los valores seteados en el objeto Configuration y los valores generados en el job1. ya con los datos en sus variables correspondientes se ejecuta el map según lo definido en los ejercicios de MapReduce y en el Reduce igual.
+
+
+
+    - hdfs dfs -mkdir datos
+    - hdfs dfs -put /home/cloudera/workspace/ivan-rozas/src/main/resources/ejercicios/histograma/histograma.txt datos/histograma.txt
+
+    - hadoop jar ivan-rozas-0.0.1-SNAPSHOT-job.jar Histograma-hadoop-flow datos/histograma.txt datos/histograma-out 10
+
+
+
+
+
+Ejercicio 2
+
+La ruta de los paquetes es "src/main/java/ejercicios/amigos/hadoop"
+
+La peculiaridad de este ejercicio, es que se a creado la clase 'RelacionAmigosWritable' para manejar de una manera mas facil el value que se pasa del map al reduce. el conjunto de clave/valor consiste en un boolean y un String. por lo demás, se ha resuelto según lo definido en los ejercicios de MapReduce
+
+    - hdfs dfs -put /home/cloudera/workspace/ivan-rozas/src/main/resources/ejercicios/amigos/amigos.txt datos/amigos.txt
+
+    - hadoop jar ivan-rozas-0.0.1-SNAPSHOT-job.jar Amigos-hadoop datos/amigos.txt datos/amigos-out
+
+
+
+
+
+Ejercicio 3
+
+La ruta de los paquetes es "src/main/java/ejercicios/amigos/pangool".
+
+El schema que se ha generado contempla los dos amigos y la relación entre ambos (campo 'esAmigo'), de esta forma en el map una vez hecho el Split por el espacio que separa los dos amigos, formamos dos tuplas de salida, una con la relación directa y otra con la relación inversa. Ya en el reduce resolvemos las tuplas según esta definido en los ejercicios de MapReduce. En el TubleMRBuilder se agrupa por el campo 'amigo1'.
+
+    - En eset caso no se hade 'hdfs dfs -put' porque ya se ha hecho en el ejercicio anterior
+
+    - hadoop jar ivan-rozas-0.0.1-SNAPSHOT-job.jar Amigos-pangool datos/amigos.txt datos/pangool/amigosPangool-out
